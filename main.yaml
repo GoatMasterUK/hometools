@@ -78,3 +78,5 @@
 - name: Run Compose via shell
   become: true
   shell: "docker-compose -f /home/docker/docker-compose.yaml"
+
+  # Test
