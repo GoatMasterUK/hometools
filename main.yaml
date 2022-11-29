@@ -39,6 +39,9 @@
 - name: Move our automation file to Docker user home dir
   file:
     path: /home/docker/docker-compose.yaml
+    owner: docker
+    group: docker
+    mode: 0655
     src: ./automation
 
 - name: Run Compose via shell
