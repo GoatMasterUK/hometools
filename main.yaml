@@ -25,6 +25,37 @@
     name: "*"
     update_cache: yes
 
+- name: Create docker group
+  group:
+    name: docker
+    state: present
+
+- user:
+    name: "docker"
+    group: "docker"
+    shell: "/bin/bash"
+
+- name: Make sure we have a 'wheel' group
+  group:
+    name: wheel
+    state: present
+
+- name: Allow 'wheel' group to have passwordless sudo
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%wheel'
+    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+
+- name: Add sudoers users to wheel group
+  user:
+    name=docker
+    groups=wheel
+    append=yes
+    state=present
+    createhome=yes
+
 - name: Install Docker
   apt: 
     name: docker-ce
@@ -32,7 +63,7 @@
 
 - name: Move Docker-Compose file to Docker user home dir
   file: 
-    path: /home/docker/.docker/cli-plugins/docker-compose
+    path: /home/docker/cli-plugins/docker-compose
     src: ./docker-compose
     mode: 0777
 
