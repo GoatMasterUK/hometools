@@ -38,8 +38,18 @@
 
 - name: Move our automation file to Docker user home dir
   file:
-    path: /home/docker/automation
-    src: ./automation
+    path: /home/docker/docker-compose.yml
+    src: ./docker-compose.yml
+
+- name: Put HomeAssistant files in opt
+  file:
+    path: /opt
+    src: ./homeassistant
+
+- name: Put PiHole files in opt
+  file: 
+    path: /opt
+    src: ./pihole    
 
 - name: Run Compose via shell
   become: true
