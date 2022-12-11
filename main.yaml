@@ -1,56 +1,60 @@
 ---
-
-
-- name: Update OS
-  apt: 
-    name: "*"
-    state: latest
-
-- name: Install Docker required packages
-  apt: 
-    pkg:
-      - lsb-release
-      - ca-certificates
-      - apt-transport-https
-      - software-properties-common
-  
-- name: GPG magic
-  shell: "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg"
-
-- name: More magic
-  shell: "echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null"
-
-- name: Update the packes again
-  apt:
-    name: "*"
-    update_cache: yes
-
-- name: Install Docker
-  apt: 
-    name: docker-ce
-    state: latest
-
-- name: Move Docker-Compose file to Docker user home dir
-  file: 
-    path: /home/docker/.docker/cli-plugins/docker-compose
-    src: ./docker-compose
-    mode: 0777
-
-- name: Move our automation file to Docker user home dir
-  file:
-    path: /home/docker/docker-compose.yml
-    src: ./docker-compose.yml
-
-- name: Put HomeAssistant files in opt
-  file:
-    path: /opt
-    src: ./homeassistant
-
-- name: Put PiHole files in opt
-  file: 
-    path: /opt
-    src: ./pihole    
-
-- name: Run Compose via shell
+- hosts: local
+  gather_facts: yes
   become: true
-  shell: "docker-compose -f /home/docker/automation"
+
+  tasks:
+
+  - name: Update OS
+    apt: 
+      name: "*"
+      state: latest
+
+  - name: Install Docker required packages.
+    apt: 
+      pkg:
+        - lsb-release
+        - ca-certificates
+        - apt-transport-https
+        - software-properties-common
+    
+  - name: GPG magic
+    shell: "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg"
+
+  - name: More magic
+    shell: "echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null"
+
+  - name: Update the packes again
+    apt:
+      name: "*"
+      update_cache: yes
+
+  - name: Install Docker
+    apt: 
+      name: docker-ce
+      state: latest
+
+  - name: Move Docker-Compose file to Docker user home dir
+    file: 
+      path: /home/docker/.docker/cli-plugins/docker-compose
+      src: ./docker-compose
+      mode: 0777
+
+  - name: Move our automation file to Docker user home dir
+    file:
+      path: /home/docker/docker-compose.yml
+      src: ./docker-compose.yml
+
+  - name: Put HomeAssistant files in opt
+    file:
+      path: /opt
+      src: ./homeassistant
+
+  - name: Put PiHole files in opt
+    file: 
+      path: /opt
+      src: ./pihole    
+
+  - name: Run Compose via shell
+    become: true
+    shell: "docker-compose -f /home/docker/automation"
